@@ -39,16 +39,69 @@ def resize(img, w):
   print(dims)
   return cv2.resize(img, dims, interpolation = cv2.INTER_AREA)
 
+# create a test matrix nxn, 1 - n^2
+def testMatrix(n):
+  t = (n*n)
+  m = np.arange(t)
+  m.shape=(-1,n)
+  
+  return m
+  
+#takes a matrix, and the sigma value for the submatrix,
+#then returns an nxn matrix of kernal matrices
+def kernal(m, sigma):
+  if  (sigma % 2 == 0):
+    sys.exit("sigma must be odd number")
+
+  th = int(np.floor(sigma / 2)) #threshold is the floor of have the number (assuming odd number)
+  res = np.empty(np.shape(m), dtype=object)
+
+  #iterate over each element and get its kernal, k
+  for idn, val in np.ndenumerate(m):
+    x = idn[0]
+    y = idn[1]
+
+    k = m[max(0, y-th) : y + (th+1), max(0, x-th) : x + (th+1)]
+#    print(x,y)
+#    print(k)
+    res[x,y] = k
+
+  return res
+
+
+#takes in a matrix, and a sigma value, then returns a matrix averaged over that kernal
+def blockFilter(m, sigma):
+  k = kernal(m, sigma)
+  mat = k[1,1]
+  avg = np.average(mat)
+  res = np.empty(np.shape(m))
+  
+  for idn, val in np.ndenumerate(k):
+    x = idn[0]
+    y = idn[1]
+  
+    res[x,y] = np.average(k[x,y])
+ 
+  
+  return(res)
 
 
 
 def main():
 #  print(input_img.shape)
-  resized = resize(input_img, 900)
-  disp(resized)
+
+#  resized = resize(input_img, 900)
+#  disp(resized)
 
 
-  cv2.destroyAllWindows()
+#  cv2.destroyAllWindows()
+
+  m = testMatrix(10)
+#  k = kernal(m, 5)
+  blockFilter(m, 5)
+  print (m)
+  
+
   exit 
 
 
